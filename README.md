@@ -19,7 +19,7 @@ Note that bare repos don't have a tracking branch. Some incremental linters and 
 You can use `go install`
 
 ```bash
-  go install github.com/filipvisko/fidi@latest
+go install github.com/filipVisko/fidi@latest
 ```
 
 ...or download one of the releases and add it to your `$PATH`.
