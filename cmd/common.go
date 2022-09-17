@@ -14,7 +14,6 @@ const (
 	workTree   = "worktree"
 )
 
-// Returns the bare repository path used as the parent folder of worktrees.
 func getRepoPath() (string, error) {
 	var path string
 	dirType, err := getDirType()
@@ -35,10 +34,12 @@ func getRepoPath() (string, error) {
 	} else {
 		return "", fmt.Errorf("%q is an unknown directory type", dirType)
 	}
+	if path == ".git" {
+		return "", fmt.Errorf("not a bare repo")
+	}
 	return strings.TrimSpace(path), nil
 }
 
-// Returns true if the current directory is a bare repo.
 func isBare() (bool, error) {
 	r, err := exec.Command(gitCommand, "rev-parse", "--is-bare-repository").Output()
 	if err != nil {
@@ -51,7 +52,6 @@ func isBare() (bool, error) {
 	return boolVal, nil
 }
 
-// Returns true if the current directory is a worktree.
 func isWorkingTree() (bool, error) {
 	r, err := exec.Command(gitCommand, "rev-parse", "--is-inside-work-tree").Output()
 	if err != nil {
@@ -64,7 +64,6 @@ func isWorkingTree() (bool, error) {
 	return boolVal, nil
 }
 
-// Figure out what kind of directory is fidi being ran in.
 func getDirType() (string, error) {
 	b, err := isBare()
 	if err != nil {

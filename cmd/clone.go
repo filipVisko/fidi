@@ -11,17 +11,17 @@ import (
 func CloneCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "clone",
-		Short: "Clones a repo as bare with and adds a '.git' suffix to its local folder name.",
+		Short: "Clone a remote repo as bare.",
 		Run: func(cmd *cobra.Command, args []string) {
 			logger := logrus.New()
 			url := args[0]
-			CloneRepo(url, logger)
+			cloneRepo(url, logger)
 		},
 	}
 	return cmd
 }
 
-func CloneRepo(url string, logger *logrus.Logger) {
+func cloneRepo(url string, logger *logrus.Logger) {
 	cmd := exec.Command(gitCommand, "clone", "--bare", url)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

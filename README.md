@@ -1,47 +1,53 @@
 Fidi is an opinionated yet simplified workflow for git branching.
 
-It's meant to be used as an alias of commonly used git commands for managing braches but replacing the workflow for one that uses [worktrees](https://git-scm.com/docs/git-worktree).
-Fidi will clone repos as [bare](https://git-scm.com/docs/git-clone#Documentation/git-clone.txt---bare) which then enables you to checkout new branches as ephemeral worktrees that are subfolders of the bare repo as `bare_repo_name.git/branch_name`.
-Fidi leaves the `.git` suffix when cloning to differentiate between bare and non-bare repos.
+It wraps your native `git` client and is meant to be used as a replacement command for managing branches.
+It does this by creating [worktrees](https://git-scm.com/docs/git-worktree) as sub-folders of a [bare](https://git-scm.com/docs/git-clone#Documentation/git-clone.txt---bare) repo.
+This allows you to have multiple checked-out branches on disk and the ability to swap between them using `cd` without the need to use `git stash` for cleaning up unfinished changes.
 
-Worktrees are great. I don't know why this feature is not as well known.
-- They allow you to have multiple checked-out branches at the same time.
-- They make switching branches easier by leaving your untracked changes unmodified inside of their worktree.
-  - You no longer need to use the git stash workflow or commit your unfinished changes.
-- You could create distinct per-branch [watchman](https://facebook.github.io/watchman/) configurations to trigger commands on file change.
+Fidi makes it simpler to use worktrees when compared to using the git's worktree commands directly:
+- It takes over the management of the checkout path when creating new worktrees by always placing them as a sub-folder of the parent bare repo, providing you with a consistent use pattern and uncluttered file tree.
+- It can delete a worktree and its branch reference with a single command.
+- Makes it easy to pull branch changes while in the worktree of a different branch. Useful for quickly merging `origin/main` into your dev branch.
 
-However, there are some DX issues with using worktrees so fidi exists to make them smoother to use.
+```bash
+$ pwd
+~/repo_name.git/main # path to main branch
 
-Note that bare repos don't have a tracking branch. Some incremental linters and build tools don't like that very much.
+# create a new branch
+$ fidi add test_branch
+Preparing worktree (new branch 'test_branch')
+~/repo_name.git/test_branch # path to new branch
+
+# use cd to swap between branches
+cd ~/repo_name.git/test_branch
+```
+
+Note that you can't have a tracking branch when using bare repos. Incremental linters may not like that.
 
 ## Installing fidi
-
-You can use `go install`
 
 ```bash
 go install github.com/filipVisko/fidi@latest
 ```
 
-...or download one of the releases and add it to your `$PATH`.
+Or download a release and add it to your `$PATH`.
 
-### Add fidi aliases
+### Add aliases into your shell
 
 Fidi was designed to be used as an alias which reduces the need to pass flags.
-You can use it directly but aliases are faster and don't require you to mess with your muscle memory for working with git.
-Here's a list of aliases that you could use as an example. I'm following the pattern used by the [git plugin for oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/git).
+As an example here, I'm following the alias pattern used by the [git plugin](https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/git) for oh-my-zsh and replaced the following git aliases with fidi.
 
 ```bash
-# If you're using the oh-my-zsh git plugin, your '.zshrc' may contain...
+# my git aliases
 alias g="git"
 alias ga="git add"
 alias gaa="git add --all"
 alias gp="git push"
 
-# You could replace parts of the oh-my-zsh provided alias values with the following...
-alias gcl="fidi clone"        # similar to 'git clone'
-alias gb="fidi add"           # similar to 'git branch'
-alias gbd="fidi remove"       # similar to 'git branch -d'
-alias gbD="fidi force-remove" # similar to 'git branch -D'
-
-# 'fidi add' can be evaluated into a cd command via script to make it behave similar to 'git checkout -b'
+# fidi aliases
+alias gcl="fidi clone"        # similar to 'git clone' but clones the repo as bare
+alias gb="fidi add"           # similar to 'git branch', will create a new worktree as a subfolder of the bare repo as 'repo_name.git/branch_name'
+alias gpb="fidi pull"         # will pull changes from the remote into the desired branch without changing directory
+alias gbd="fidi remove"       # similar to 'git branch -d', will delete the worktree and the branch reference
+alias gbD="fidi force-remove" # similar to 'git branch -D', will force delete the worktree and branch reference
 ```

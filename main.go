@@ -16,6 +16,7 @@ func main() {
 		cmd.CloneCommand(),
 		cmd.FetchCommand(),
 		cmd.ForceRemoveCommand(),
+		cmd.PullCommand(),
 		cmd.RemoveCommand(),
 	)
 
