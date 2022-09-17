@@ -10,11 +10,11 @@ import (
 func RemoveCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "remove",
-		Short: "Removes a worktree and its branch.",
+		Short: "Removes a worktree and its branch reference.",
 		Run: func(cmd *cobra.Command, args []string) {
 			logger := logrus.New()
 			name := args[0]
-			RemoveWorktree(name, logger, false)
+			removeWorktree(name, logger, false)
 		},
 	}
 	return cmd
@@ -23,17 +23,17 @@ func RemoveCommand() *cobra.Command {
 func ForceRemoveCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "force-remove",
-		Short: "Forcibly removes a worktree and its branch.",
+		Short: "Forcibly removes a worktree and its branch reference.",
 		Run: func(cmd *cobra.Command, args []string) {
 			logger := logrus.New()
 			name := args[0]
-			RemoveWorktree(name, logger, true)
+			removeWorktree(name, logger, true)
 		},
 	}
 	return cmd
 }
 
-func RemoveWorktree(name string, logger *logrus.Logger, force bool) {
+func removeWorktree(name string, logger *logrus.Logger, force bool) {
 	cmd := exec.Command(gitCommand, "worktree", "remove", name)
 	if force {
 		cmd = exec.Command(gitCommand, "worktree", "remove", name, "--force")
@@ -48,6 +48,6 @@ func RemoveWorktree(name string, logger *logrus.Logger, force bool) {
 	}
 	err = cmd.Run()
 	if err != nil {
-		logger.Warnf("unable to delete branch: %s\n", err)
+		logger.Warnf("unable to delete branch %q: %s\n", name, err)
 	}
 }

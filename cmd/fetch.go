@@ -11,18 +11,18 @@ import (
 func FetchCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "fetch",
-		Short: "Executes 'git fetch --all'",
+		Short: "Runs 'git fetch --all'",
 		Run: func(cmd *cobra.Command, _ []string) {
 			logger := logrus.New()
-			Fetch(logger)
+			fetch(logger)
 		},
 	}
 	return cmd
 }
 
-func Fetch(logger *logrus.Logger) {
+func fetch(logger *logrus.Logger) {
 	cmd := exec.Command(gitCommand, "fetch", "--all")
-	cmd.Stdout = os.Stderr
+	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
 	if err != nil {

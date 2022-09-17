@@ -13,17 +13,17 @@ import (
 func AddCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add",
-		Short: "Creates a new branch as a worktree inside of a bare repo.",
+		Short: "Add a new worktree.",
 		Run: func(cmd *cobra.Command, args []string) {
 			logger := logrus.New()
 			name := args[0]
-			AddWorktree(name, logger)
+			addWorktree(name, logger)
 		},
 	}
 	return cmd
 }
 
-func AddWorktree(name string, logger *logrus.Logger) {
+func addWorktree(name string, logger *logrus.Logger) {
 	var cmd *exec.Cmd
 	repoPath, err := getRepoPath()
 	if err != nil {
@@ -32,12 +32,11 @@ func AddWorktree(name string, logger *logrus.Logger) {
 
 	path := filepath.Join(repoPath, name)
 	cmd = exec.Command(gitCommand, workTree, "add", path)
-	cmd.Stdout = os.Stderr
+	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err = cmd.Run()
 	if err != nil {
-		logger.Fatalf("unable to add worktree: %s\n", err)
+		logger.Fatalf("unable to add worktree %q: %s\n", path, err)
 	}
-
-	fmt.Println(path) // evaluate into a bash variable for cd
+	fmt.Println(path)
 }
