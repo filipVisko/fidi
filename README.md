@@ -1,12 +1,12 @@
 Fidi is an opinionated yet simplified workflow for git branching.
 
-It wraps your native `git` client and is meant to be used as replacement command for managing branches.
+It wraps your native `git` client and is meant to be used as a replacement command for managing branches.
 It does this by creating [worktrees](https://git-scm.com/docs/git-worktree) as sub-folders of a [bare](https://git-scm.com/docs/git-clone#Documentation/git-clone.txt---bare) repo.
-This allows you to have multiple checked out branches on-disk and the ability to swap between them using `cd` without the need to use `git stash` for cleaning up unfinished changes.
+This allows you to have multiple checked-out branches on disk and the ability to swap between them using `cd` without the need to use `git stash` for cleaning up unfinished changes.
 
 Fidi makes it simpler to use worktrees when compared to using the git's worktree commands directly:
-- It takes over the management of the checkout path when creating new worktrees by always placing them as a sub-folder of the parent bare repo, providing you with a consistant use pattern and uncluttered file tree.
-- It able to delete the worktree and its branch reference with a single command.
+- It takes over the management of the checkout path when creating new worktrees by always placing them as a sub-folder of the parent bare repo, providing you with a consistent use pattern and uncluttered file tree.
+- It can delete a worktree and its branch reference with a single command.
 - Makes it easy to pull branch changes while in the worktree of a different branch. Useful for quickly merging `origin/main` into your dev branch.
 
 ```bash
@@ -47,7 +47,7 @@ alias gp="git push"
 # fidi aliases
 alias gcl="fidi clone"        # similar to 'git clone' but clones the repo as bare
 alias gb="fidi add"           # similar to 'git branch', will create a new worktree as a subfolder of the bare repo as 'repo_name.git/branch_name'
-alias gpb="fidi pull"         # will pull changes from the remote into a desired branch without changing directory
+alias gpb="fidi pull"         # will pull changes from the remote into the desired branch without changing directory
 alias gbd="fidi remove"       # similar to 'git branch -d', will delete the worktree and the branch reference
 alias gbD="fidi force-remove" # similar to 'git branch -D', will force delete the worktree and branch reference
 ```
