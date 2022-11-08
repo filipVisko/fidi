@@ -1,9 +1,6 @@
 package cmd
 
 import (
-	"os"
-	"os/exec"
-
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -21,11 +18,5 @@ func FetchCommand() *cobra.Command {
 }
 
 func fetch(logger *logrus.Logger) {
-	cmd := exec.Command(gitCommand, "fetch", "--all")
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	err := cmd.Run()
-	if err != nil {
-		logger.Fatalf("unable to 'git fetch --all': %s\n", err)
-	}
+	_ = runCmd(gitCommand, "fetch", "--all")
 }

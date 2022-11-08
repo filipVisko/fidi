@@ -2,8 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
 	"path/filepath"
 
 	"github.com/sirupsen/logrus"
@@ -14,6 +12,7 @@ func AddCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add",
 		Short: "Add a new worktree.",
+		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			logger := logrus.New()
 			name := args[0]
@@ -24,19 +23,16 @@ func AddCommand() *cobra.Command {
 }
 
 func addWorktree(name string, logger *logrus.Logger) {
-	var cmd *exec.Cmd
 	repoPath, err := getRepoPath()
 	if err != nil {
 		logger.Fatalf("unable to find the bare repo's path")
 	}
 
 	path := filepath.Join(repoPath, name)
-	cmd = exec.Command(gitCommand, workTree, "add", path)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	err = cmd.Run()
+	err = runCmd(gitCommand, workTree, "add", path)
 	if err != nil {
 		logger.Fatalf("unable to add worktree %q: %s\n", path, err)
 	}
+	// useful to wrap into a shell function to auto-cd into new worktree
 	fmt.Println(path)
 }

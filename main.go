@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/filipVisko/fidi/cmd"
+	"github.com/filipVisko/fidi/internal/cmd"
 	"github.com/spf13/cobra"
 )
 

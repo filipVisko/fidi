@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"os"
-	"os/exec"
 	"path/filepath"
 
 	"github.com/sirupsen/logrus"
@@ -13,6 +12,7 @@ func PullCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "pull",
 		Short: "Pulls remote changes into a worktree.",
+		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			logger := logrus.New()
 			name := args[0]
@@ -31,11 +31,5 @@ func pullBranch(name string, logger *logrus.Logger) {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	cmd := exec.Command(gitCommand, "pull")
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	err = cmd.Run()
-	if err != nil {
-		logger.Fatalf("unable to pull: %s\n", err)
-	}
+	_ = runCmd(gitCommand, "pull")
 }
