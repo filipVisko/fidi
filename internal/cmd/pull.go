@@ -4,17 +4,16 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-func PullCommand() *cobra.Command {
+func PullCommand(logger *log.Logger) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "pull",
 		Short: "Pulls remote changes into a worktree.",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			logger := logrus.New()
 			name := args[0]
 			pullBranch(name, logger)
 		},
@@ -22,14 +21,18 @@ func PullCommand() *cobra.Command {
 	return cmd
 }
 
-func pullBranch(name string, logger *logrus.Logger) {
-	repoPath, err := getRepoPath()
+func pullBranch(name string, logger *log.Logger) {
+	repoPath, err := GetCommonDir()
 	if err != nil {
 		logger.Fatal(err)
 	}
+	// ideally we should check for existance of worktree first
 	err = os.Chdir(filepath.Join(repoPath, name))
 	if err != nil {
 		logger.Fatal(err)
 	}
-	_ = runCmd(gitCommand, "pull")
+	err = runCmd("git", "pull")
+	if err != nil {
+		logger.Fatal(err)
+	}
 }
