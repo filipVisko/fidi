@@ -22,12 +22,12 @@ func PullCommand(logger *log.Logger) *cobra.Command {
 }
 
 func pullBranch(name string, logger *log.Logger) {
-	repoPath, err := GetCommonDir()
+	commonDir, err := GetCommonDir()
 	if err != nil {
 		logger.Fatal(err)
 	}
 	// ideally we should check for existance of worktree first
-	err = os.Chdir(filepath.Join(repoPath, name))
+	err = os.Chdir(filepath.Join(commonDir, name))
 	if err != nil {
 		logger.Fatal(err)
 	}

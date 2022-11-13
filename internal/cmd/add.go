@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 
 	log "github.com/sirupsen/logrus"
@@ -22,14 +23,21 @@ func AddCommand(logger *log.Logger) *cobra.Command {
 }
 
 func addWorktree(name string, logger *log.Logger) {
-	repoPath, err := GetCommonDir()
+	commonDir, err := GetCommonDir()
 	if err != nil {
 		logger.Fatal(err)
 	}
-	path := filepath.Join(repoPath, name)
-	err = runCmd("git", "worktree", "add", path)
+	args := []string{"worktree", "add", filepath.Join(commonDir, name)}
+
+	// if remote branch exists, track it
+	_, err = os.Stat(fmt.Sprintf("%s/refs/remotes/origin/%s", commonDir, name))
+	if err == nil {
+		args = append(args, "--track", name)
+	}
+
+	err = runCmd("git", args...)
 	if err != nil {
 		logger.Fatal(err)
 	}
-	fmt.Println(path) // show where we've added a worktree
+	fmt.Println(filepath.Join(commonDir, name)) // show the new worktree path
 }
