@@ -15,24 +15,27 @@ func PullCommand(logger *log.Logger) *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			name := args[0]
-			pullBranch(name, logger)
+			err := pullBranch(name)
+			if err != nil {
+				logger.Fatal(err)
+			}
 		},
 	}
 	return cmd
 }
 
-func pullBranch(name string, logger *log.Logger) {
+func PullBranch(name string) error {
 	commonDir, err := GetCommonDir()
 	if err != nil {
-		logger.Fatal(err)
+		return err
 	}
 	// ideally we should check for existance of worktree first
 	err = os.Chdir(filepath.Join(commonDir, name))
 	if err != nil {
-		logger.Fatal(err)
+		return err
 	}
 	err = runCmd("git", "pull")
 	if err != nil {
-		logger.Fatal(err)
+		return err
 	}
 }

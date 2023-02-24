@@ -11,15 +11,18 @@ func FetchCommand(logger *log.Logger) *cobra.Command {
 		Short: "Runs 'git fetch --all'",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, _ []string) {
-			fetch(logger)
+			err := fetch()
+			if err != nil {
+				logger.Fatal(err)
+			}
 		},
 	}
 	return cmd
 }
 
-func fetch(logger *log.Logger) {
+func fetch() error {
 	err := runCmd("git", "fetch", "--all")
 	if err != nil {
-		logger.Fatal(err)
+		return err
 	}
 }

@@ -12,7 +12,10 @@ func RemoveCommand(logger *log.Logger) *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			name := args[0]
-			removeWorktree(name, logger, false)
+			err := removeWorktree(name, true)
+			if err != nil {
+				logger.Warn(err)
+			}
 		},
 	}
 	return cmd
@@ -26,13 +29,16 @@ func ForceRemoveCommand(logger *log.Logger) *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			name := args[0]
-			removeWorktree(name, logger, true)
+			err := removeWorktree(name, true)
+			if err != nil {
+				logger.Warn(err)
+			}
 		},
 	}
 	return cmd
 }
 
-func removeWorktree(name string, logger *log.Logger, force bool) {
+func RemoveWorktree(name string, force bool) {
 	args := []string{name}
 	if force {
 		args = append(args, "--force")
@@ -41,12 +47,12 @@ func removeWorktree(name string, logger *log.Logger, force bool) {
 	worktreeArgs = append(worktreeArgs, args...)
 	err := runCmd("git", worktreeArgs...)
 	if err != nil {
-		logger.Warn(err)
+		return err
 	}
 	branchArgs := []string{"branch", "--delete"}
 	branchArgs = append(branchArgs, args...)
 	err = runCmd("git", branchArgs...)
 	if err != nil {
-		logger.Warn(err)
+		return err
 	}
 }

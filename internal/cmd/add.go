@@ -16,16 +16,19 @@ func AddCommand(logger *log.Logger) *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			name := args[0]
-			addWorktree(name, logger)
+			err := AddWorktree(name)
+			if err != nil {
+				logger.Fatal(err)
+			}
 		},
 	}
 	return cmd
 }
 
-func addWorktree(name string, logger *log.Logger) {
+func AddWorktree(name string) error {
 	commonDir, err := GetCommonDir()
 	if err != nil {
-		logger.Fatal(err)
+		return err
 	}
 	args := []string{"worktree", "add", filepath.Join(commonDir, name)}
 
@@ -37,7 +40,7 @@ func addWorktree(name string, logger *log.Logger) {
 
 	err = runCmd("git", args...)
 	if err != nil {
-		logger.Fatal(err)
+		return err
 	}
 	fmt.Println(filepath.Join(commonDir, name)) // show the new worktree path
 }
