@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/filipVisko/fidi/internal/cmd"
+	"github.com/filipVisko/fidi/cmd"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
