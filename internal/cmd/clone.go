@@ -17,7 +17,7 @@ func CloneCommand(logger *log.Logger) *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			url := args[0]
-			err := cloneRepo(url)
+			err := CloneRepo(url)
 			if err != nil {
 				logger.Fatal(err)
 			}
@@ -42,6 +42,7 @@ func CloneRepo(url string) error {
 	// configure the bare repo to track all remote branches
 	err = runCmd("git", "config", "remote.origin.fetch", "+refs/heads/*:refs/remotes/origin/*")
 	if err != nil {
-		return fmt.errorf("unable to track remote refs: %s", err)
+		return fmt.Errorf("unable to track remote refs: %s", err)
 	}
+	return nil
 }

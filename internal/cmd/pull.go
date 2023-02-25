@@ -15,7 +15,7 @@ func PullCommand(logger *log.Logger) *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			name := args[0]
-			err := pullBranch(name)
+			err := PullBranch(name)
 			if err != nil {
 				logger.Fatal(err)
 			}
@@ -38,4 +38,5 @@ func PullBranch(name string) error {
 	if err != nil {
 		return err
 	}
+	return nil
 }

@@ -43,4 +43,5 @@ func AddWorktree(name string) error {
 		return err
 	}
 	fmt.Println(filepath.Join(commonDir, name)) // show the new worktree path
+	return nil
 }
