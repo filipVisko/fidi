@@ -26,7 +26,7 @@ func AddCommand(logger *log.Logger) *cobra.Command {
 }
 
 func AddWorktree(name string) error {
-	commonDir, err := GetCommonDir()
+	commonDir, err := getCommonDir()
 	if err != nil {
 		return err
 	}

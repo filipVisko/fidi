@@ -25,7 +25,7 @@ func PullCommand(logger *log.Logger) *cobra.Command {
 }
 
 func PullBranch(name string) error {
-	commonDir, err := GetCommonDir()
+	commonDir, err := getCommonDir()
 	if err != nil {
 		return err
 	}

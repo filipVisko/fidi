@@ -14,7 +14,7 @@ func runCmd(name string, arg ...string) error {
 	return cmd.Run()
 }
 
-func GetCommonDir() (string, error) {
+func getCommonDir() (string, error) {
 	out, err := exec.Command("git", "rev-parse", "--git-common-dir").CombinedOutput()
 	if err != nil {
 		return "", fmt.Errorf("git exec error: %s: %s", out, err)
