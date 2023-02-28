@@ -17,16 +17,19 @@ func AddWorktree(name string) error {
 		return err
 	}
 
-	// git worktree add -b BRANCH_NAME WORKTREE_PATH REMOTE_BRANCH_NAME
+	exists, ok := branchExists(name, commonDir)
+	if ok != nil {
+		return ok
+	}
+
 	args := []string{"worktree", "add", "-b", name, filepath.Join(commonDir, name)}
-	_, err = os.Stat(fmt.Sprintf("%s/refs/remotes/origin/%s", commonDir, name))
-	if err == nil {
-		args = append(args, fmt.Sprintf("origin/%s", name))
+	if exists {
+		args = []string{"worktree", "add", name, filepath.Join(commonDir, name), "--guess-remote"}
 	}
 
 	err = runCmd("git", args...)
 	if err != nil {
-		return err
+		return fmt.Errorf("git worktree error: %s", err)
 	}
 	fmt.Println(filepath.Join(commonDir, name)) // show the path to allow for easy cd
 	return nil
@@ -39,7 +42,7 @@ func CloneRepo(url string) error {
 	}
 	err := runCmd("git", "clone", "--bare", url)
 	if err != nil {
-		return err
+		return fmt.Errorf("git clone error: %s", err)
 	}
 	repoPath := path.Base(url)
 	err = os.Chdir(repoPath)
@@ -69,7 +72,7 @@ func PullBranch(name string) error {
 	}
 	err = runCmd("git", "pull")
 	if err != nil {
-		return err
+		return fmt.Errorf("git pull error: %s", err)
 	}
 	return nil
 }

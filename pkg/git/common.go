@@ -1,9 +1,11 @@
 package git
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
@@ -26,4 +28,26 @@ func getCommonDir() (string, error) {
 		return "", fmt.Errorf("current dir is not a worktree of a bare repo")
 	}
 	return strings.TrimSpace(commonDir), nil
+}
+
+func branchExists(name string, commonDir string) (bool, error) {
+	_, err := os.Stat(fmt.Sprintf("%s/refs/remotes/origin/%s", commonDir, name))
+	if err == nil {
+		return true, nil
+	}
+
+	refsFile, err := os.Open(filepath.Join(commonDir, "packed-refs"))
+	if err != nil {
+		return false, fmt.Errorf("cannot open the repo's packed-refs file: %s", err)
+	}
+	defer refsFile.Close()
+
+	scanner := bufio.NewScanner(refsFile)
+	for scanner.Scan() {
+		l := scanner.Text()
+		if strings.Contains(l, fmt.Sprintf("refs/heads/%s", name)) {
+			return true, nil
+		}
+	}
+	return false, nil
 }
