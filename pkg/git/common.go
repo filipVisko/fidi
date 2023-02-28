@@ -21,9 +21,8 @@ func getCommonDir() (string, error) {
 	}
 	commonDir := string(out)
 
-	// check the edge cases of being within the main or a linked worktree of a standard repo
-	// since fidi cannot handle $GIT_DIR being a child directory in a worktree
-	if strings.Contains(commonDir, "/.git") || commonDir == ".git" {
+	// error out if within the main worktree or a linked worktree of a non-bare repo
+	if strings.Contains(commonDir, string(os.PathSeparator)+".git") || commonDir == ".git" {
 		return "", fmt.Errorf("current dir is not a worktree of a bare repo")
 	}
 	return strings.TrimSpace(commonDir), nil

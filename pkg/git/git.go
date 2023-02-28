@@ -6,38 +6,42 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+
+	"go.uber.org/multierr"
 )
 
+// add a new worktree and track any similarly named remote branches
 func AddWorktree(name string) error {
 	commonDir, err := getCommonDir()
 	if err != nil {
 		return err
 	}
-	args := []string{"worktree", "add", filepath.Join(commonDir, name)}
 
-	// if remote branch exists, track it
+	// git worktree add -b BRANCH_NAME WORKTREE_PATH REMOTE_BRANCH_NAME
+	args := []string{"worktree", "add", "-b", name, filepath.Join(commonDir, name)}
 	_, err = os.Stat(fmt.Sprintf("%s/refs/remotes/origin/%s", commonDir, name))
 	if err == nil {
-		args = append(args, "--track", name)
+		args = append(args, fmt.Sprintf("origin/%s", name))
 	}
 
 	err = runCmd("git", args...)
 	if err != nil {
 		return err
 	}
-	fmt.Println(filepath.Join(commonDir, name)) // show the new worktree path
+	fmt.Println(filepath.Join(commonDir, name)) // show the path to allow for easy cd
 	return nil
 }
 
+// clone repo as bare and configure it to track remote branches
 func CloneRepo(url string) error {
 	if !strings.Contains(url, ".git") {
 		return fmt.Errorf("url must contain a .git suffix")
 	}
-	repoPath := path.Base(url)
 	err := runCmd("git", "clone", "--bare", url)
 	if err != nil {
 		return err
 	}
+	repoPath := path.Base(url)
 	err = os.Chdir(repoPath)
 	if err != nil {
 		return err
@@ -59,10 +63,9 @@ func PullBranch(name string) error {
 	if err != nil {
 		return err
 	}
-	// ideally we should check for existance of worktree first
 	err = os.Chdir(filepath.Join(commonDir, name))
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot cd into worktree: %s", err)
 	}
 	err = runCmd("git", "pull")
 	if err != nil {
@@ -72,6 +75,7 @@ func PullBranch(name string) error {
 }
 
 func RemoveWorktree(name string, force bool) error {
+	name = strings.TrimSuffix(name, string(os.PathSeparator))
 	args := []string{name}
 	if force {
 		args = append(args, "--force")
@@ -79,12 +83,9 @@ func RemoveWorktree(name string, force bool) error {
 	worktreeArgs := []string{"worktree", "remove"}
 	worktreeArgs = append(worktreeArgs, args...)
 	err := runCmd("git", worktreeArgs...)
-	if err != nil {
-		return err
-	}
 	branchArgs := []string{"branch", "--delete"}
 	branchArgs = append(branchArgs, args...)
-	err = runCmd("git", branchArgs...)
+	err = multierr.Append(err, runCmd("git", branchArgs...))
 	if err != nil {
 		return err
 	}
