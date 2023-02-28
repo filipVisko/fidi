@@ -1,3 +1,5 @@
+all : lint install
+
 lint:
 	golangci-lint run --fix
 
