@@ -29,7 +29,7 @@ func AddWorktree(name string) error {
 
 	err = runCmd("git", args...)
 	if err != nil {
-		return fmt.Errorf("git worktree error: %s", err)
+		return err
 	}
 	fmt.Println(filepath.Join(commonDir, name)) // show the path to allow for easy cd
 	return nil
@@ -42,17 +42,19 @@ func CloneRepo(url string) error {
 	}
 	err := runCmd("git", "clone", "--bare", url)
 	if err != nil {
-		return fmt.Errorf("git clone error: %s", err)
+		return fmt.Errorf("error cloning git repo: %s", err)
 	}
+
 	repoPath := path.Base(url)
 	err = os.Chdir(repoPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("error changing directory into newly cloned git repo: %s", err)
 	}
+
 	// configure the bare repo to track all remote branches
 	err = runCmd("git", "config", "remote.origin.fetch", "+refs/heads/*:refs/remotes/origin/*")
 	if err != nil {
-		return fmt.Errorf("unable to track remote refs: %s", err)
+		return fmt.Errorf("error configuring git repo: %s", err)
 	}
 	return nil
 }
@@ -68,7 +70,7 @@ func PullBranch(name string) error {
 	}
 	err = os.Chdir(filepath.Join(commonDir, name))
 	if err != nil {
-		return fmt.Errorf("cannot cd into worktree: %s", err)
+		return fmt.Errorf("error accessing worktree directory: %s", err)
 	}
 	err = runCmd("git", "pull")
 	if err != nil {
@@ -83,12 +85,15 @@ func RemoveWorktree(name string, force bool) error {
 	if force {
 		args = append(args, "--force")
 	}
+
 	worktreeArgs := []string{"worktree", "remove"}
 	worktreeArgs = append(worktreeArgs, args...)
 	err := runCmd("git", worktreeArgs...)
+
 	branchArgs := []string{"branch", "--delete"}
 	branchArgs = append(branchArgs, args...)
 	err = multierr.Append(err, runCmd("git", branchArgs...))
+
 	if err != nil {
 		return err
 	}
