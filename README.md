@@ -38,16 +38,16 @@ Fidi was designed to be used as an alias which reduces the need to pass flags.
 As an example here, I'm following the alias pattern used by the [git plugin](https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/git) for oh-my-zsh and replaced the following git aliases with fidi.
 
 ```bash
-# my git aliases
+# git aliases
 alias g="git"
 alias ga="git add"
 alias gaa="git add --all"
 alias gp="git push"
 
 # fidi aliases
-alias gcl="fidi clone"        # similar to 'git clone' but clones the repo as bare
-alias gb="fidi add"           # similar to 'git branch', will create a new worktree as a subfolder of the bare repo as 'repo_name.git/branch_name'
-alias gpb="fidi pull"         # will pull changes from the remote into the desired branch without changing directory
-alias gbd="fidi remove"       # similar to 'git branch -d', will delete the worktree and the branch reference
-alias gbD="fidi force-remove" # similar to 'git branch -D', will force delete the worktree and branch reference
+alias gcl="fidi clone"          # Clone a repository as a bare repository
+alias gb="fidi add"             # Create a new worktree for a branch in the bare repository
+alias gpb="fidi pull"           # Pull changes from the remote into the desired branch without changing directory
+alias gbd="fidi remove"         # Remove a worktree and its branch reference
+alias gbD="fidi remove --force" # Remove a worktree and its branch reference forcefully
 ```

@@ -27,7 +27,6 @@ func main() {
 		AddCommand(logger),
 		CloneCommand(logger),
 		FetchCommand(logger),
-		ForceRemoveCommand(logger),
 		PullCommand(logger),
 		RemoveCommand(logger),
 	)
@@ -99,34 +98,20 @@ func FetchCommand(logger *log.Logger) *cobra.Command {
 }
 
 func RemoveCommand(logger *log.Logger) *cobra.Command {
+	var force bool
 	cmd := &cobra.Command{
 		Use:   "remove",
 		Short: "Removes a worktree and its branch reference.",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			name := args[0]
-			err := git.RemoveWorktree(name, true)
+			err := git.RemoveWorktree(name, force)
 			if err != nil {
 				logger.Warn(err)
 			}
 		},
 	}
-	return cmd
-}
 
-// fidi avoids using flags because the intention is to wrap commands in shell aliases
-func ForceRemoveCommand(logger *log.Logger) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "force-remove",
-		Short: "Forcibly removes a worktree and its branch reference.",
-		Args:  cobra.ExactArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			name := args[0]
-			err := git.RemoveWorktree(name, true)
-			if err != nil {
-				logger.Warn(err)
-			}
-		},
-	}
+	cmd.Flags().BoolVarP(&force, "force", "f", false, "force removal of worktree and branch")
 	return cmd
 }
