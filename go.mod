@@ -3,7 +3,7 @@ module github.com/filipVisko/fidi
 go 1.19
 
 require (
-	github.com/sirupsen/logrus v1.9.0
+	github.com/sirupsen/logrus v1.9.1
 	github.com/spf13/cobra v1.5.0
 	go.uber.org/multierr v1.9.0
 )
